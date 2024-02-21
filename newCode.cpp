@@ -3,19 +3,46 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include <utility>
 
 // Define the dimensions of the maze
-const int ROWS = 5;
-const int COLS = 5;
+const int ROWS = 10;
+const int COLS = 10;
 
 // Define the maze layout using a 2D array
 char maze[ROWS][COLS] = {
-    {'0', '1', '0', '0', '0'},
-    {'0', '1', '1', '1', '0'},
-    {'0', '0', '0', '0', '0'},
-    {'1', '1', '1', '1', '0'},
-    {'0', '0', '0', 'C', '0'}
+    {'0', '1', '0', '0', '0', '0', '1', '0', '0', '0'},
+    {'0', '1', '1', '1', '0', '0', '1', '0', 'C', '0'},
+    {'0', '0', '0', '0', '0', '0', '1', '0', '0', '0'},
+    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
+    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
+    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
+    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
+    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
+    {'1', '0', '1', '1', '0', '0', '1', '0', '0', '0'},
+    {'0', '0', '0', '0', '0', '0', '1', '0', '0', '0'}
 };
+
+int cheeseROW = 0;
+int cheeseCOL = 0;
+
+// Function to find the location of the cheese ('C') in the maze
+std::pair<int, int> findCheeseLocation(int ROWS, int COLS) {
+    for (int i = 0; i < ROWS; ++i) {
+        for (int j = 0; j < COLS; ++j) {
+            if (maze[i][j] == 'C') {
+                
+                // cheeseROW = i;
+                // cheeseCOL = j;
+                return std::make_pair(i, j);
+            }
+        }
+    }
+    // If cheese is not found
+    return std::make_pair(-1, -1);
+}
+
+
 
 // Define the rat's position in the maze
 struct Rat {
@@ -32,8 +59,8 @@ int manhattanDistance(int row1, int col1, int row2, int col2) {
 // Fitness function: Evaluate how close the rat is to the cheese
 double evaluateFitness(const Rat& rat) {
     // Calculate Manhattan distance between rat and cheese
-    int distance = manhattanDistance(rat.row, rat.col, ROWS - 1, COLS - 2);
-
+    //int distance = manhattanDistance(rat.row, rat.col, ROWS - 1, COLS - 2); AI provided, technically correct but the cheese may not be in the bottom corner
+    int distance = manhattanDistance(rat.row, rat.col, cheeseROW, cheeseCOL);
     // Fitness is inversely proportional to distance
     return 1.0 / (distance + 1);
 }
@@ -77,10 +104,12 @@ int rouletteWheelSelection(const std::vector<double>& fitnessValues) {
 }
 
 // Crossover function: Partially Mapped Crossover (PMX)
-// Crossover function: Partially Mapped Crossover (PMX)
-// Crossover function: Partially Mapped Crossover (PMX)
-// Crossover function: Partially Mapped Crossover (PMX)
 void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child1, Rat& child2) {
+    
+    // Print parent positions
+   // std::cout << "Parent 1 - Row: " << parent1.row << ", Col: " << parent1.col << std::endl;
+   // std::cout << "Parent 2 - Row: " << parent2.row << ", Col: " << parent2.col << std::endl;
+
     std::vector<int> mapping1(ROWS * COLS, -1);
     std::vector<int> mapping2(ROWS * COLS, -1);
 
@@ -90,9 +119,13 @@ void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child
     }
 
     // Create mapping 2
-    int parent2Index = parent2.row * COLS + parent2.col;
-    if (parent2Index >= 0 && parent2Index < ROWS * COLS) {
-        mapping2[parent2Index] = parent1.row * COLS + parent1.col;
+    // int parent2Index = parent2.row * COLS + parent2.col;
+    // if (parent2Index >= 0 && parent2Index < ROWS * COLS) {
+    //     mapping2[parent2Index] = parent1.row * COLS + parent1.col;
+    // }
+
+    for (int i = parent2.row * COLS; i < (parent2.row + 1) * COLS; ++i) {
+        mapping2[i % (ROWS * COLS)] = parent1.row * COLS + i % COLS;
     }
 
     // Apply mapping 1 to child 1
@@ -139,10 +172,15 @@ void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child
             child2.col = newCol;
         }
     }
+
+   // std::cout << "Child 1 - Row: " << child1.row << ", Col: " << child1.col << std::endl;
+   // std::cout << "Child 2 - Row: " << child2.row << ", Col: " << child2.col << std::endl;
 }
 
 // Mutation function: Swap Mutation
 void swapMutation(Rat& rat) {
+    //std::cout << "Original position - Row: " << rat.row << ", Col: " << rat.col << std::endl;
+
     int direction = std::rand() % 4;
     int newRow = rat.row;
     int newCol = rat.col;
@@ -175,6 +213,8 @@ void swapMutation(Rat& rat) {
         rat.row = newRow;
         rat.col = newCol;
     }
+
+    std::cout << "New position - Row: " << rat.row << ", Col: " << rat.col << std::endl;
 }
 
 
@@ -185,11 +225,16 @@ int main() {
     // Seed the random number generator
     std::srand(std::time(nullptr));
 
+    //get cheese location
+    std::pair<int, int> cheesePos = findCheeseLocation(ROWS, COLS);
+    cheeseROW = cheesePos.first; //Chat GPT didn't tell me to do this
+    cheeseCOL = cheesePos.second;
+
     // Define population size
-    const int POPULATION_SIZE = 10;
+    const int POPULATION_SIZE = 8; //been changed - Has to be a multiple of 4 for Chat GPTs code to function
 
     // Define number of generations
-    const int NUM_GENERATIONS = 5;
+    const int NUM_GENERATIONS = 10;
 
    // Initialize population of rats
     std::vector<Rat> population;
@@ -197,15 +242,16 @@ int main() {
         int randomRow = std::rand() % ROWS;
         int randomCol = std::rand() % COLS;
         
-    // Check if the random position is within maze bounds
-    if (randomRow >= 0 && randomRow < ROWS && randomCol >= 0 && randomCol < COLS) {
-        population.push_back(Rat(randomRow, randomCol));
-    } else {
-        // Handle invalid position (e.g., by retrying or setting a default position)
-        // For simplicity, you can retry generating random positions until a valid one is found
-        --i; // Retry generating a random position
+        // Check if the random position is within maze bounds
+        if (randomRow >= 0 && randomRow < ROWS && randomCol >= 0 && randomCol < COLS) {
+            population.push_back(Rat(1, 1));
+        } else {
+            // Handle invalid position (e.g., by retrying or setting a default position)
+            // For simplicity, you can retry generating random positions until a valid one is found
+            --i; // Retry generating a random position
+            //population.push_back(Rat(2, 2));
+        }
     }
-}
 
 
     // Initialize variables to track the best rat found
@@ -261,7 +307,7 @@ int main() {
         for (int i = 0; i < POPULATION_SIZE; ++i) {
             std::cout << "Rat " << i+1 << " - Row: " << population[i].row << ", Col: " << population[i].col << std::endl;
         }
-
+        printMazeWithRat(bestRat);
         std::cout << std::endl;
     }
 
