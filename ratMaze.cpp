@@ -10,18 +10,55 @@ const int ROWS = 10;
 const int COLS = 10;
 
 // Define the maze layout using a 2D array
+//Defining a few different mazes to easily demonstrate and test. AI didn't tell me to do this, but I think this would be simple enough for someone with no experiance to do
+// 0 = Free Space
+// 1 = Wall
+// C = CHEESE
+// Rats start at 0, 0
+
+//Blank Board
 char maze[ROWS][COLS] = {
-    {'0', '1', '0', '0', '0', '0', '1', '0', '0', '0'},
-    {'0', '1', '1', '1', '0', '0', '1', '0', 'C', '0'},
-    {'0', '0', '0', '0', '0', '0', '1', '0', '0', '0'},
-    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
-    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
-    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
-    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
-    {'1', '1', '1', '1', '0', '0', '1', '0', '0', '0'},
-    {'1', '0', '1', '1', '0', '0', '1', '0', '0', '0'},
-    {'0', '0', '0', '0', '0', '0', '1', '0', '0', '0'}
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', 'C', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'}
 };
+
+
+//Just a maze
+// char maze[ROWS][COLS] = {
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
+//    {'1', '1', '1', '0', '0', '1', '1', '0', '0', '1'},
+//    {'0', '0', '1', '0', '0', '1', '0', '0', '0', '0'},
+//    {'0', '0', '1', '0', '0', '1', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '1', '1', '1', '0', '1'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '1', '1', '0', '0', '0', '0', '1', '0', '0'},
+//    {'C', '1', '0', '0', '0', '0', '0', '1', '0', '0'}
+// };
+
+//THE SPIRAL
+// char maze[ROWS][COLS] = {
+//     {'0', '1', '1', '1', '1', '1', '1', '1', '1', '1'},
+//     {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//     {'1', '1', '1', '1', '1', '1', '0', '1', '1', '1'},
+//     {'0', '1', '1', '1', '1', '1', '0', '1', '0', '0'},
+//     {'0', '1', '0', '0', '0', '1', '0', '1', '0', '0'},
+//     {'0', '1', '0', '1', 'C', '1', '0', '1', '0', '0'},
+//     {'0', '1', '0', '1', '1', '1', '0', '1', '0', '0'},
+//     {'0', '1', '0', '0', '0', '0', '0', '1', '0', '0'},
+//     {'0', '1', '1', '1', '1', '1', '1', '1', '0', '0'},
+//     {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'}
+// };
+
 
 int cheeseROW = 0;
 int cheeseCOL = 0;
@@ -103,6 +140,23 @@ int rouletteWheelSelection(const std::vector<double>& fitnessValues) {
     return -1;
 }
 
+// Check if a given position is valid (not a wall)
+bool isValidPosition(int row, int col) {
+    if (row >= 0 && row < ROWS && col >= 0 && col < COLS && maze[row][col] != '1') {
+        return true;
+    }
+    return false;
+}
+
+// Function to move a rat to a new position
+void moveRatToPosition(Rat& rat, int newRow, int newCol) {
+    if (isValidPosition(newRow, newCol)) {
+        rat.row = newRow;
+        rat.col = newCol;
+    }
+}
+
+
 // Crossover function: Partially Mapped Crossover (PMX)
 void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child1, Rat& child2) {
     
@@ -157,8 +211,9 @@ void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child
         int newRow = newPos / COLS;
         int newCol = newPos % COLS;
         if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
-            child1.row = newRow;
-            child1.col = newCol;
+            //child1.row = newRow;
+            //child1.col = newCol;
+            moveRatToPosition(child1, newRow, newCol);
         }
     }
 
@@ -168,10 +223,15 @@ void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child
         int newRow = newPos / COLS;
         int newCol = newPos % COLS;
         if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
-            child2.row = newRow;
-            child2.col = newCol;
+            //child2.row = newRow;
+            //child2.col = newCol;
+            moveRatToPosition(child2, newRow, newCol);
         }
     }
+
+    // Update children positions using mappings with bounds checking
+    
+    
 
    // std::cout << "Child 1 - Row: " << child1.row << ", Col: " << child1.col << std::endl;
    // std::cout << "Child 2 - Row: " << child2.row << ", Col: " << child2.col << std::endl;
@@ -207,14 +267,16 @@ void swapMutation(Rat& rat) {
             }
             break;
     }
-
+    // Update rat's position if within bounds and not a wall
+    
     // Update rat's position if within bounds
     if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
-        rat.row = newRow;
-        rat.col = newCol;
+        //rat.row = newRow;
+        //rat.col = newCol;
+        moveRatToPosition(rat, newRow, newCol);
     }
 
-    std::cout << "New position - Row: " << rat.row << ", Col: " << rat.col << std::endl;
+    //std::cout << "New position - Row: " << rat.row << ", Col: " << rat.col << std::endl;
 }
 
 
@@ -244,12 +306,12 @@ int main() {
         
         // Check if the random position is within maze bounds
         if (randomRow >= 0 && randomRow < ROWS && randomCol >= 0 && randomCol < COLS) {
-            population.push_back(Rat(1, 1));
+            population.push_back(Rat(0, 0));
         } else {
             // Handle invalid position (e.g., by retrying or setting a default position)
             // For simplicity, you can retry generating random positions until a valid one is found
             --i; // Retry generating a random position
-            //population.push_back(Rat(2, 2));
+            
         }
     }
 
