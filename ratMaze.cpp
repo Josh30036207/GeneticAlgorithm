@@ -17,33 +17,33 @@ const int COLS = 10;
 // Rats start at 0, 0
 
 //Blank Board
-char maze[ROWS][COLS] = {
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', 'C', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'}
-};
+// char maze[ROWS][COLS] = {
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', 'C', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'}
+// };
 
 
 //Just a maze
-// char maze[ROWS][COLS] = {
-//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
-//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
-//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
-//    {'1', '1', '1', '0', '0', '1', '1', '0', '0', '1'},
-//    {'0', '0', '1', '0', '0', '1', '0', '0', '0', '0'},
-//    {'0', '0', '1', '0', '0', '1', '0', '0', '0', '0'},
-//    {'0', '0', '0', '0', '0', '1', '1', '1', '0', '1'},
-//    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
-//    {'0', '1', '1', '0', '0', '0', '0', '1', '0', '0'},
-//    {'C', '1', '0', '0', '0', '0', '0', '1', '0', '0'}
-// };
+char maze[ROWS][COLS] = {
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '1'},
+   {'1', '1', '1', '0', '0', '1', '1', '0', '0', '1'},
+   {'0', '0', '1', '0', '0', '1', '0', '0', '0', '0'},
+   {'0', '0', '1', '0', '0', '1', '0', '0', '0', '0'},
+   {'0', '0', '0', '0', '0', '1', '1', '1', '0', '1'},
+   {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0'},
+   {'0', '1', '1', '0', '0', '0', '0', '1', '0', '0'},
+   {'C', '1', '0', '0', '0', '0', '0', '1', '0', '0'}
+};
 
 //THE SPIRAL
 // char maze[ROWS][COLS] = {
@@ -160,9 +160,7 @@ void moveRatToPosition(Rat& rat, int newRow, int newCol) {
 // Crossover function: Partially Mapped Crossover (PMX)
 void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child1, Rat& child2) {
     
-    // Print parent positions
-   // std::cout << "Parent 1 - Row: " << parent1.row << ", Col: " << parent1.col << std::endl;
-   // std::cout << "Parent 2 - Row: " << parent2.row << ", Col: " << parent2.col << std::endl;
+
 
     std::vector<int> mapping1(ROWS * COLS, -1);
     std::vector<int> mapping2(ROWS * COLS, -1);
@@ -173,11 +171,6 @@ void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child
     }
 
     // Create mapping 2
-    // int parent2Index = parent2.row * COLS + parent2.col;
-    // if (parent2Index >= 0 && parent2Index < ROWS * COLS) {
-    //     mapping2[parent2Index] = parent1.row * COLS + parent1.col;
-    // }
-
     for (int i = parent2.row * COLS; i < (parent2.row + 1) * COLS; ++i) {
         mapping2[i % (ROWS * COLS)] = parent1.row * COLS + i % COLS;
     }
@@ -211,8 +204,7 @@ void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child
         int newRow = newPos / COLS;
         int newCol = newPos % COLS;
         if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
-            //child1.row = newRow;
-            //child1.col = newCol;
+
             moveRatToPosition(child1, newRow, newCol);
         }
     }
@@ -223,18 +215,14 @@ void partiallyMappedCrossover(const Rat& parent1, const Rat& parent2, Rat& child
         int newRow = newPos / COLS;
         int newCol = newPos % COLS;
         if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
-            //child2.row = newRow;
-            //child2.col = newCol;
+          
             moveRatToPosition(child2, newRow, newCol);
         }
     }
 
     // Update children positions using mappings with bounds checking
     
-    
-
-   // std::cout << "Child 1 - Row: " << child1.row << ", Col: " << child1.col << std::endl;
-   // std::cout << "Child 2 - Row: " << child2.row << ", Col: " << child2.col << std::endl;
+   
 }
 
 // Mutation function: Swap Mutation
@@ -296,7 +284,7 @@ int main() {
     const int POPULATION_SIZE = 8; //been changed - Has to be a multiple of 4 for Chat GPTs code to function
 
     // Define number of generations
-    const int NUM_GENERATIONS = 10;
+    const int NUM_GENERATIONS = 500; //Change this to increase the number of generations; need a big number else it won't find the cheese
 
    // Initialize population of rats
     std::vector<Rat> population;
@@ -307,6 +295,7 @@ int main() {
         // Check if the random position is within maze bounds
         if (randomRow >= 0 && randomRow < ROWS && randomCol >= 0 && randomCol < COLS) {
             population.push_back(Rat(0, 0));
+            //population.push_back(Rat(randomRow, randomCol));//change to 0,0 for rats to start at 0,0 of the maze, takes longer though as offspring can only get variance from initial mutations
         } else {
             // Handle invalid position (e.g., by retrying or setting a default position)
             // For simplicity, you can retry generating random positions until a valid one is found
